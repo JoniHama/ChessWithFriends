@@ -15,7 +15,7 @@
                 <TranslateTransform X="-268" Y="16"/>
             </TransformGroup>
         </Canvas.RenderTransform>
-        <Canvas x:Name="pieceCanvas" Height="800" Width="800" RenderTransformOrigin="0.5,0.5" Canvas.Left="268" Canvas.Top="-16" Panel.ZIndex="-1">
+        <Canvas x:Name="pieceCanvas" Height="800" Width="800" RenderTransformOrigin="0.5,0.5" Canvas.Left="268" Canvas.Top="-16" Panel.ZIndex="1">
             <Canvas.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>

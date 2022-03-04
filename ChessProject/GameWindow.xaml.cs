@@ -61,6 +61,16 @@ namespace ChessProject
                 }
                 Console.WriteLine();
             }
+            PieceCreator creator = new PieceCreator();
+            List<Image> pieces = creator.PieceCreation(board);
+
+            foreach (Image piece in pieces)
+            {
+                Console.WriteLine(piece.Name);
+                pieceCanvas.Children.Add(piece);
+            }
+
+            /*
             Image pawn = new Image();
             pawn.Width = 1000;
             pawn.Height = 100;
@@ -70,21 +80,9 @@ namespace ChessProject
             Console.WriteLine(pawn.Source);
             Canvas.SetTop(pawn, 100);
             Board.Children.Add(pawn);
-            Console.WriteLine("hei");
+            Console.WriteLine("hei");*/
 
         }
-
-        public BitmapImage GetImageFromSource()
-        {
-            BitmapImage bitmapImage = new BitmapImage();
-            bitmapImage.BeginInit();
-            bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-            bitmapImage.UriSource = new Uri(@"F:\Visual Studio Projektit\ChessProject\ChessProject\Assets\Chess_bdt45.png", UriKind.RelativeOrAbsolute);
-            bitmapImage.EndInit();
-
-            return bitmapImage;
-        }
-
         public void BoardCreation()
         {
             int linerow = 8;
