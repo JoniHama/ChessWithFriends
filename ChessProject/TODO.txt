@@ -1,0 +1,13 @@
+﻿Options:
+- playername (Is shown on GameWindow)
+- possible for image (Is Shown on GameWindow)
+- Music volume
+- Sound effect volume
+
+Multiplayer window:
+- Again possible for name change
+- IP connect + port
+--> GameWindow
+
+Singleplayer window:
+- only the whole game :)
