@@ -9,5 +9,17 @@ Multiplayer window:
 - IP connect + port
 --> GameWindow
 
+Other:
+- game record agaisnt certain players
+
 Singleplayer window:
 - only the whole game :)
+
+
+Hiiren koordinaatit
+	- sijainti laudalla (funktio) esim. D2
+		- objektityypistä mahdolliset siirrot
+			- katsotaan, onko ketään tiellä
+			--> muutetaan BoardManagerin taulua ja kirjoitetaan päinvastainen funktio, joka muuttaa feniksi
+
+

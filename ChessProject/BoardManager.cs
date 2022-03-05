@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows;
 using System.Threading.Tasks;
 
 namespace ChessProject
@@ -116,6 +117,45 @@ namespace ChessProject
             }
 
             return board;
+        }
+
+        public List<int> Location(Point pt)
+        {
+            Console.WriteLine(pt);
+            Console.WriteLine(pt.X);
+            List<int> a = new List<int>();
+
+            // Determining the board's first value
+            if (pt.X > 0)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    if (i*100 <= pt.X && pt.X <= i*100+100)
+                    {
+                        a.Add(7 - i);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Mouse's x-coordinate is off the canvas!");
+            }
+            if (pt.Y > 0)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (j * 100 <= pt.Y && pt.Y <= j * 100 + 100)
+                    {
+                        a.Add(j);
+                    }
+                }
+            }
+            else
+            {
+                Console.WriteLine("Mouse's y-coordinate is off the canvas!");
+            }
+
+            return a;
         }
 
 

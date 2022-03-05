@@ -12,6 +12,8 @@ namespace ChessProject
 {
     internal class PieceCreator
     {
+        public int B_pawncount = 1;
+        public int W_pawncount = 1;
         public List<Image> PieceCreation(string[,] board)
         {
             int height = 100;
@@ -36,7 +38,7 @@ namespace ChessProject
                     }
 
                     pawn.Source = GetImageFromSource(pawn.Name);
-                    Canvas.SetLeft(pawn, k * 100);
+                    Canvas.SetRight(pawn, k * 100);
                     Canvas.SetTop(pawn, l * 100);
                     pieces.Add(pawn);
                 }
@@ -91,11 +93,29 @@ namespace ChessProject
                     name = "Error";
                     break;
             }
+            if (c == (char)112)
+            {
+                name += B_pawncount;
+                B_pawncount++;
+            }
+            if (c == (char)80)
+            {
+                name += W_pawncount;
+                W_pawncount++;
+            }
             return name;
         }
 
         public BitmapImage GetImageFromSource(string name)
         {
+            if (W_pawncount > 0 || B_pawncount > 0)
+            {
+                if (name.Contains("Pawn"))
+                {
+                    name = name.Remove(name.Length - 1);
+                }
+            }
+
             string fileName = @"Assets\" + name + ".png";
 
             string combining = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\..\"));
