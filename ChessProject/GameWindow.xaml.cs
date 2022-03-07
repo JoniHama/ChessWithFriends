@@ -23,11 +23,19 @@ namespace ChessProject
     public partial class GameWindow : Window
     {
         public List<Image> pieces = new List<Image>();
+        public List<Rectangle> highlightedBoards = new List<Rectangle>();
+        public List<Brush> highlightedColors = new List<Brush>();
         public string[,] board = new string[8, 8];
         public Rectangle clickedBoard;
         public Brush clickedBrush;
-        public Point pt;
-
+        public Point pawnPt;
+        public Point pawnPt2;
+        public Point boardPt;
+        public bool pieceSelected = false;
+        public UIElement latestPawn;
+        public string latestpawnName;
+        public List<int> lastpawnLoc = new List<int>();
+        public bool whiteTurn = true;
         public GameWindow()
         {
             InitializeComponent();
@@ -59,14 +67,7 @@ namespace ChessProject
             board = boardmanager.Creator("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             //For vizualisation without images through console output
-            for (int i = 0; i < board.GetLength(0); i++)
-            {
-                for (int j = 0; j < board.GetLength(1); j++)
-                {
-                    Console.Write("{0} ", board[i, j]);
-                }
-                Console.WriteLine();
-            }
+            VisualiseBoard();
             PieceCreator creator = new PieceCreator();
             pieces = creator.PieceCreation(board);
 
@@ -88,6 +89,17 @@ namespace ChessProject
             Board.Children.Add(pawn);
             Console.WriteLine("hei");*/
 
+        }
+        public void VisualiseBoard()
+        {
+            for (int i = 0; i < board.GetLength(0); i++)
+            {
+                for (int j = 0; j < board.GetLength(1); j++)
+                {
+                    Console.Write("{0} ", board[i, j]);
+                }
+                Console.WriteLine();
+            }
         }
         public void BoardCreation()
         {
@@ -141,7 +153,7 @@ namespace ChessProject
             {
                 return;
             }
-            pieceCanvas.Children.Remove(element);
+            //pieceCanvas.Children.Remove(element);
             Point p = Mouse.GetPosition(this);
             Console.WriteLine(elementname);
             //element.PreviewMouseDown += Element_PreviewMouseDown;
@@ -180,7 +192,16 @@ namespace ChessProject
 
         private void Board_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            pt = e.GetPosition((UIElement)sender);
+            if (pieceSelected == true)
+            {
+                boardPt = e.GetPosition((UIElement)sender);
+                pawnPt2 = e.GetPosition((UIElement)sender);
+            }
+            else
+            {
+                pawnPt = e.GetPosition((UIElement)sender);
+            }
+            Point pt = e.GetPosition((UIElement)sender);
             Console.WriteLine(pt);
             VisualTreeHelper.HitTest(this, null, new HitTestResultCallback(myCallback), new PointHitTestParameters(pt));
         }
@@ -188,6 +209,33 @@ namespace ChessProject
         {
             if (result.VisualHit.GetType() == typeof(Image))
             {
+                var index = pieceCanvas.Children.IndexOf((Image)result.VisualHit);
+                UIElement piece = pieceCanvas.Children[index];
+                string name = (piece as FrameworkElement).Name;
+
+                Console.WriteLine(name);
+
+                if (name.Contains("W") && whiteTurn == false)
+                {
+                    return HitTestResultBehavior.Continue;
+                }
+                if (name.Contains("B") && whiteTurn == true && !name.Contains("Bishop"))
+                {
+                    return HitTestResultBehavior.Continue;
+                }
+            }
+
+            if (result.VisualHit.GetType() == typeof(Image))
+            {
+                if (pieceSelected == true)
+                {
+                    for (int i = 0; i < highlightedBoards.Count; i++)
+                    {
+                        highlightedBoards[i].Fill = highlightedColors[i];
+                        pawnPt = pawnPt2;
+                    }
+                }
+
                 Console.WriteLine("HEI");
                 var index = pieceCanvas.Children.IndexOf((Image)result.VisualHit);
                 Console.WriteLine(index);
@@ -196,18 +244,36 @@ namespace ChessProject
                 //piece.RenderTransform = new TranslateTransform(0, -100);
                 Console.WriteLine("Piece " + name + " selected!");
                 BoardManager boardmanager = new BoardManager();
-                List<int> a = boardmanager.Location(pt);
+                List<int> a = boardmanager.Location(pawnPt);
+
+                List<int> possibleMoves = new List<int>();
+
+                LegalMoves legalMoves = new LegalMoves();
+                possibleMoves = legalMoves.legalLocations(a, board, name);
+
+                if (!possibleMoves.Any())
+                {
+                    return HitTestResultBehavior.Continue;
+                }
 
                 BoardValueToMatrix boardValueMatrix = new BoardValueToMatrix();
 
-                (Board.Children[boardValueMatrix.BoardValue(4,5)] as Rectangle).Fill = Brushes.Red;
-                (Board.Children[boardValueMatrix.BoardValue(4, 4)] as Rectangle).Fill = Brushes.Red;
+                int indexValue = 0;
+                int indexValue2 = 1;
 
-                LegalMoves legalMoves = new LegalMoves();
-                legalMoves.Highlighter(a, board);
+                Console.WriteLine("Count" + possibleMoves.Count);
 
-                PieceMover pieceMover = new PieceMover();
-                pieceMover.Mover(piece, name, a);
+                for (int i = 0; i < possibleMoves.Count / 2; i++)
+                {
+                    highlightedBoards.Add((Board.Children[boardValueMatrix.BoardValue(possibleMoves[indexValue], possibleMoves[indexValue2])] as Rectangle));
+                    highlightedColors.Add((Board.Children[boardValueMatrix.BoardValue(possibleMoves[indexValue], possibleMoves[indexValue2])] as Rectangle).Fill);
+                    (Board.Children[boardValueMatrix.BoardValue(possibleMoves[indexValue], possibleMoves[indexValue2])] as Rectangle).Fill = Brushes.Red;
+                    indexValue = indexValue + 2;
+                    indexValue2 = indexValue2 + 2;
+                }
+                pieceSelected = true;
+                latestPawn = piece;
+                latestpawnName = name;
 
                 foreach (var i in a)
                 {
@@ -217,17 +283,100 @@ namespace ChessProject
 
             if (result.VisualHit.GetType() == typeof(Rectangle))
             {
-                if(clickedBoard != null)
+                if (((Rectangle)result.VisualHit).Fill == Brushes.Red) 
                 {
-                    clickedBoard.Fill = clickedBrush;
+                    Console.WriteLine("Klikkasit punaista ruutua!");
+                    BoardManager boardmanager = new BoardManager();
+                    List<int> boardLocation = boardmanager.Location(boardPt);
+                    List<int> pawnLocation = boardmanager.Location(pawnPt);
+
+                    Console.WriteLine(boardLocation[0]);
+                    Console.WriteLine(boardLocation[1]);
+                    Console.WriteLine(pawnLocation[0]);
+                    Console.WriteLine(pawnLocation[1]);
+                    Console.WriteLine("Selected pawn name " + latestpawnName);
+
+                    //((UIElement)result.VisualHit).TranslatePoint(expt, latestPawn);
+                    board = BoardManager.Updater(board, boardLocation, pawnLocation, "-", "P", latestpawnName);
+                    VisualiseBoard();
+                    GeneralTransform latestpawnTransform = latestPawn.TransformToAncestor(pieceCanvas);
+                    latestPawn = Mover(latestPawn, latestpawnName, boardLocation, pawnLocation, latestpawnTransform);
+
+                    if (pieceSelected == true)
+                    {
+                        for (int i = 0; i < highlightedBoards.Count; i++)
+                        {
+                            highlightedBoards[i].Fill = highlightedColors[i];
+                        }
+                    }
+                    if (clickedBoard != null)
+                    {
+                        clickedBoard.Fill = clickedBrush;
+                        clickedBrush = null;
+                        clickedBrush = null;
+                    }
+                    highlightedBoards.Clear();
+                    highlightedColors.Clear();
+                    clickedBoard = null;
                     clickedBrush = null;
-                    clickedBrush = null;
+                    pieceSelected = false;
+
+                    if (latestpawnName.Contains("W") && whiteTurn == true)
+                    {
+                        whiteTurn = false;
+                    }
+                    if (latestpawnName.Contains("B") && whiteTurn == false)
+                    {
+                        whiteTurn = true;
+                    }
+
                 }
-                clickedBrush = (((Rectangle)result.VisualHit).Fill);
-                ((Rectangle)result.VisualHit).Fill = Brushes.Yellow;
-                clickedBoard = ((Rectangle)result.VisualHit);
+                else
+                {
+                    if (clickedBoard != null)
+                    {
+                        clickedBoard.Fill = clickedBrush;
+                        clickedBrush = null;
+                        clickedBrush = null;
+                    }
+
+                    clickedBrush = (((Rectangle)result.VisualHit).Fill);
+                    ((Rectangle)result.VisualHit).Fill = Brushes.Yellow;
+                    clickedBoard = ((Rectangle)result.VisualHit);
+                }
             }
             return HitTestResultBehavior.Continue;
+        }
+        public UIElement Mover(UIElement piece, string name, List<int> toLocation, List<int> fromLocation, GeneralTransform test)
+        {
+            int yDifference = 0;
+            int xDifference = 0;
+
+            yDifference = fromLocation[1] - toLocation[1];
+            xDifference = toLocation[0] - fromLocation[0];
+
+            var index = pieceCanvas.Children.IndexOf((Image)piece);
+
+            //piece.RenderTransform = new TranslateTransform(-xDifference * 100, 0);
+            //pieceCanvas.Children[index].RenderTransform = new TranslateTransform();
+            //((TranslateTransform)pieceCanvas.Children[index].RenderTransform).X += (-xDifference * 100);
+            //((TranslateTransform)pieceCanvas.Children[index].RenderTransform).Y += (-yDifference * 100);
+            Canvas.SetTop(piece, Canvas.GetTop(piece) + (-yDifference * 100));
+            Canvas.SetRight(piece, Canvas.GetRight(piece) + (xDifference * 100));
+
+            return piece;
+        }
+
+        public bool nextTurn(bool turn)
+        {
+            if (turn == true)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
     }

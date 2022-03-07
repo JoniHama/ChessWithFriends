@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessProject"
         mc:Ignorable="d"
-        Title="GameWindow" Height="925" Width="1340" Background="White" WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
+        Title="ChessWithYourFriends" Height="925" Width="1340" Background="White" WindowStyle="SingleBorderWindow" ResizeMode="NoResize">
     <Canvas x:Name="Board" Initialized="boardCanvas_Initialized" Width="800" Height="800" Visibility="Visible" MouseLeftButtonDown="Board_MouseLeftButtonDown" Margin="0,0,500,100">
         <Canvas x:Name="pieceCanvas" Height="800" Width="800" RenderTransformOrigin="0.5,0.5" Panel.ZIndex="1" MouseLeftButtonDown="pieceCanvas_MouseLeftButtonDown" PreviewMouseMove="pieceCanvas_PreviewMouseMove" PreviewMouseUp="pieceCanvas_PreviewMouseUp" IsEnabled="False" Canvas.Left="0" Canvas.Top="0" Margin="0,0,500,100">
             <Canvas.RenderTransform>

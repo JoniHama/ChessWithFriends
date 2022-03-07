@@ -10,11 +10,14 @@ namespace ChessProject
 {
     internal class PieceMover
     {
-        public UIElement Mover(UIElement piece, string name, List<int> location)
+        public UIElement Mover(UIElement piece, string name, List<int> toLocation, List<int> fromLocation, GeneralTransform test)
         {
-            UIElement Piece = piece;
-            //Piece.RenderTransformOrigin = new TranslateTransform(0, -100);
-            return Piece;
+            int yDifference = fromLocation[1] - toLocation[1];
+            int xDifference = fromLocation[0] - toLocation[0];
+
+            piece.RenderTransform = new TranslateTransform(-xDifference * 100, -yDifference * 100);
+
+            return piece;
         }
     }
 }

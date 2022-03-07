@@ -119,6 +119,22 @@ namespace ChessProject
             return board;
         }
 
+        public static string[,] Updater(string[,] board, List<int> locationTo, List<int> locationFrom, string replacer, string replacement, string piecename)
+        {
+            if (piecename.Contains("W"))
+            {
+                replacement = replacement.ToUpper();
+            }
+            if (piecename.Contains("B"))
+            {
+                replacement = replacement.ToLower();
+            }
+
+            board[locationTo[0], locationTo[1]] = replacement;
+            board[locationFrom[0], locationFrom[1]] = replacer;
+            return board;
+        }
+
         public List<int> Location(Point pt)
         {
             Console.WriteLine(pt);
