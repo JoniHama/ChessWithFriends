@@ -36,6 +36,13 @@ namespace ChessProject
         public string latestpawnName;
         public List<int> lastpawnLoc = new List<int>();
         public bool whiteTurn = true;
+
+        public UIElement ontopPiece;
+
+        public bool destroyNext = false;
+        public UIElement destroyerPiece;
+        public List<int> destroyerboardLocation = new List<int>();
+        public List<int> destroyerpawnLocation = new List<int>();
         public GameWindow()
         {
             InitializeComponent();
@@ -64,16 +71,18 @@ namespace ChessProject
         {
             BoardCreation();
             BoardManager boardmanager = new BoardManager();
-            board = boardmanager.Creator("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+            board = boardmanager.newerCreator("r1nkq3/8/8/8/8/8/8/1Q1KBR2 w - - 0 1");
+            //string[,] boardtest = boardmanager.newerCreator("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
 
             //For vizualisation without images through console output
-            VisualiseBoard();
+            //VisualiseBoard(board);
+            VisualiseBoard(board);
             PieceCreator creator = new PieceCreator();
             pieces = creator.PieceCreation(board);
 
             foreach (Image piece in pieces)
             {
-                Console.WriteLine(piece.Name);
+                //Console.WriteLine(piece.Name);
                 pieceCanvas.Children.Add(piece);
             }
 
@@ -90,7 +99,7 @@ namespace ChessProject
             Console.WriteLine("hei");*/
 
         }
-        public void VisualiseBoard()
+        public void VisualiseBoard(string[,] board)
         {
             for (int i = 0; i < board.GetLength(0); i++)
             {
@@ -215,12 +224,14 @@ namespace ChessProject
 
                 Console.WriteLine(name);
 
-                if (name.Contains("W") && whiteTurn == false)
+                if (name[0] == 'W' && whiteTurn == false)
                 {
+                    ontopPiece = piece;
                     return HitTestResultBehavior.Continue;
                 }
-                if (name.Contains("B") && whiteTurn == true && !name.Contains("Bishop"))
+                if (name[0] == 'B' && whiteTurn == true)
                 {
+                    ontopPiece = piece;
                     return HitTestResultBehavior.Continue;
                 }
             }
@@ -248,8 +259,12 @@ namespace ChessProject
 
                 List<int> possibleMoves = new List<int>();
 
+                Console.WriteLine(a[0]);
+                Console.WriteLine(a[1]);
                 LegalMoves legalMoves = new LegalMoves();
                 possibleMoves = legalMoves.legalLocations(a, board, name);
+
+                Console.WriteLine("Possiblemoves count is " + possibleMoves.Count);
 
                 if (!possibleMoves.Any())
                 {
@@ -296,11 +311,18 @@ namespace ChessProject
                     Console.WriteLine(pawnLocation[1]);
                     Console.WriteLine("Selected pawn name " + latestpawnName);
 
-                    //((UIElement)result.VisualHit).TranslatePoint(expt, latestPawn);
-                    board = BoardManager.Updater(board, boardLocation, pawnLocation, "-", "P", latestpawnName);
-                    VisualiseBoard();
+                    string pieceShort = board[pawnLocation[0], pawnLocation[1]];
+
+                    if (isOpponent(latestpawnName, boardLocation[0], boardLocation[1]))
+                    {
+                        pieceCanvas.Children.Remove(ontopPiece);
+                    }
+
+                    board = BoardManager.Updater(board, boardLocation, pawnLocation, "-", pieceShort, latestpawnName);
+
+                    VisualiseBoard(board);
                     GeneralTransform latestpawnTransform = latestPawn.TransformToAncestor(pieceCanvas);
-                    latestPawn = Mover(latestPawn, latestpawnName, boardLocation, pawnLocation, latestpawnTransform);
+                    latestPawn = Mover(latestPawn, latestpawnName, boardLocation, pawnLocation);
 
                     if (pieceSelected == true)
                     {
@@ -321,11 +343,11 @@ namespace ChessProject
                     clickedBrush = null;
                     pieceSelected = false;
 
-                    if (latestpawnName.Contains("W") && whiteTurn == true)
+                    if (latestpawnName[0] == 'W' && whiteTurn == true)
                     {
                         whiteTurn = false;
                     }
-                    if (latestpawnName.Contains("B") && whiteTurn == false)
+                    if (latestpawnName[0] == 'B' && whiteTurn == false)
                     {
                         whiteTurn = true;
                     }
@@ -347,7 +369,7 @@ namespace ChessProject
             }
             return HitTestResultBehavior.Continue;
         }
-        public UIElement Mover(UIElement piece, string name, List<int> toLocation, List<int> fromLocation, GeneralTransform test)
+        public UIElement Mover(UIElement piece, string name, List<int> toLocation, List<int> fromLocation)
         {
             int yDifference = 0;
             int xDifference = 0;
@@ -377,6 +399,34 @@ namespace ChessProject
             {
                 return true;
             }
+        }
+
+        public bool isOpponent(string pieceName, int x, int y)
+        {
+            string opponent = board[x, y];
+            if (pieceName[0] == 'B')
+            {
+                if (char.IsUpper(opponent[0]))
+                {
+                    return true;
+                }
+                if (char.IsLower(opponent[0]))
+                {
+                    return false;
+                }
+            }
+            if (pieceName[0] == 'W')
+            {
+                if (char.IsLower(opponent[0]))
+                {
+                    return true;
+                }
+                if (char.IsUpper(opponent[0]))
+                {
+                    return false;
+                }
+            }
+            return false;
         }
 
     }

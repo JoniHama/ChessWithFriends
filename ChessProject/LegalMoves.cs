@@ -8,8 +8,11 @@ namespace ChessProject
 {
     internal class LegalMoves
     {
+        public static string Name;
+        public static bool enemyBlock = false;
         public List<int> legalLocations(List<int> location, string[,] board, string name)
         {
+            Name = name;
             List <int> vs = new List <int>();
 
             if (name.Contains("Pawn"))
@@ -25,6 +28,16 @@ namespace ChessProject
                     vs = nooneWay(board, location[0], location[1], "forward", 2, "down", name);
                     return vs;
                 }
+            }
+            if (name.Contains("Knight"))
+            {
+                vs = nooneWay(board, location[0], location[1], "knight", 2, "down", name);
+                return vs;
+            }
+            if (name.Contains("Bishop"))
+            {
+                vs = nooneWay(board, location[0], location[1], "sideways", 99, "down", name);
+                return vs;
             }
 
 
@@ -68,6 +81,145 @@ namespace ChessProject
                         }
                     }
                     break;
+                case "sideways":
+                    // 4 different directions
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (!isEnemy(board, xValue - i, yValue - i))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue - i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue - i);
+                            }
+                        }
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (!isEnemy(board, xValue + i, yValue + i))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue + i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue + i);
+                            }
+                        }
+                        if (enemyBlock == true) { break; }
+
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (!isEnemy(board, xValue - i, yValue + i))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue + i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue + i);
+                            }
+                        }
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (!isEnemy(board, xValue + i, yValue - i))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue - i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue - i);
+                            }
+                        }
+                    }
+
+                    break;
+
+
+                case "knight":
+                    if (isEnemy(board, xValue - 1, yValue - 2))
+                    {
+                        locations.Add(xValue - 1);
+                        locations.Add(yValue - 2);
+                    }
+                    if (isEnemy(board, xValue + 1, yValue - 2))
+                    {
+                        locations.Add(xValue + 1);
+                        locations.Add(yValue - 2);
+                    }
+                    if (isEnemy(board, xValue + 2, yValue - 1))
+                    {
+                        locations.Add(xValue + 2);
+                        locations.Add(yValue - 1);
+                    }
+                    if (isEnemy(board, xValue - 2, yValue - 1))
+                    {
+                        locations.Add(xValue - 2);
+                        locations.Add(yValue - 1);
+                    }
+                    if (isEnemy(board, xValue - 1, yValue + 2))
+                    {
+                        locations.Add(xValue - 1);
+                        locations.Add(yValue + 2);
+                    }
+                    if (isEnemy(board, xValue + 1, yValue + 2))
+                    {
+                        locations.Add(xValue + 1);
+                        locations.Add(yValue + 2);
+                    }
+                    if (isEnemy(board, xValue + 2, yValue + 1))
+                    {
+                        locations.Add(xValue + 2);
+                        locations.Add(yValue + 1);
+                    }
+                    if (isEnemy(board, xValue - 2, yValue + 1))
+                    {
+                        locations.Add(xValue - 2);
+                        locations.Add(yValue + 1);
+                    }
+                    break;
+
             }
             if (name.Contains("Pawn"))
             {
@@ -114,6 +266,49 @@ namespace ChessProject
 
             return locations;
 
+        }
+
+        public bool isEnemy(string[,] board, int xValue, int yValue)
+        {
+            char pieceChar;
+            try
+            {
+                pieceChar = char.Parse(board[xValue, yValue]);
+            }
+            catch
+            {
+                return false;
+            }
+
+            if (pieceChar == '-')
+            {
+                return true;
+            }
+            if (Name[0] == 'W')
+            {
+                if (char.IsUpper(pieceChar))
+                {
+                    return false;
+                }
+                if (char.IsLower(pieceChar))
+                {
+                    enemyBlock = true;
+                    return true;
+                }
+            }
+            if (Name[0] == 'B')
+            {
+                if (char.IsUpper(pieceChar))
+                {
+                    enemyBlock = true;
+                    return true;
+                }
+                if (char.IsLower(pieceChar))
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }

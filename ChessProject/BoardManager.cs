@@ -94,18 +94,17 @@ namespace ChessProject
                     {
                         if (hasbeenspace == false)
                         {
-                            for (int i = 0; i < ((int)c-1); i++)
+                            if (c == '8')
                             {
-                                try
+                                for (int i = 0; i < ((int)c - 1); i++)
                                 {
-                                    board[i, row] = "-";
+                                    try
+                                    {
+                                        board[i, row] = "-";
+                                    }
+                                    catch { Console.WriteLine("Null value at" + idx + " " + i); break; }
                                 }
-                                catch { Console.WriteLine("Null value at" + idx + " " + i); break; }
                             }
-                        }
-                        else
-                        {
-                            //look for whose turn it is
                         }
                     }
                 }
@@ -118,14 +117,130 @@ namespace ChessProject
 
             return board;
         }
+        public string[,] newerCreator(string FEN)
+        {
+            string[,] board = new string[8, 8];
+            bool hasbeenspace = false;
+            int fenindex = 0;
+            string fen;
+            for (int i = 0; i < 8; i++)
+            {
+                if (hasbeenspace == true)
+                {
+                    break;
+                }
+
+                for (int j = 7; j >= 0; j--)
+                {
+                    try
+                    {
+                        fen = FEN[fenindex].ToString();
+                        Console.WriteLine("hello");
+                    }
+                    catch { break; }
+
+                    if (fen == " ")
+                    {
+                        hasbeenspace = true;
+                        break;
+                    }
+
+                    if (fen == "/")
+                    {
+                        fenindex++;
+                        fen = FEN[fenindex].ToString();
+                    }
+                    if (char.IsDigit(fen[0]) && hasbeenspace == false)
+                    {
+                        for (int k = 0; k < Int32.Parse(fen); k++)
+                        {
+                            try
+                            {
+                                if (j == 6 && board[j+1,i] == null)
+                                {
+                                    j++;
+                                }
+
+                                board[j, i] = "-";
+                                j--;
+                            }
+                            catch { break; }
+                        }
+                        j++;
+                        fenindex++;
+                        continue;
+                    }
+                    else
+                    {
+                        board[j, i] = fen;
+                        fenindex++;
+                    }
+                }
+            }
+
+            return board;
+        }
+
+        public string[,] newCreator(string FEN)
+        {
+            string[,] board = new string[8, 8];
+            bool hasbeenspace = false;
+            int fenindex = 0;
+            string fen;
+            for (int i = 0; i < 8; i++)
+            {
+                if (hasbeenspace == true)
+                {
+                    break;
+                }
+
+                for (int j = 0; j < 8; j++)
+                {
+                    try
+                    {
+                        fen = FEN[fenindex].ToString();
+                    }
+                    catch { break; }
+
+                    if (fen == " ")
+                    {
+                        hasbeenspace = true;
+                        break;
+                    }
+
+                    if (fen == "/")
+                    {
+                        fenindex++;
+                        j--;
+                        fen = FEN[fenindex].ToString();
+                    }
+                    else
+                    {
+                        board[j, i] = fen;
+                        fenindex++;
+                    }
+                    if (char.IsDigit(fen[0]) && hasbeenspace == false) 
+                    {
+                        for (int k = 0; k < Int32.Parse(fen); k++)
+                        {
+                            board[k, i] = "-";
+                        }
+                        fenindex++;
+                        break;
+                    }
+                }
+            }
+
+            return board;
+        }
 
         public static string[,] Updater(string[,] board, List<int> locationTo, List<int> locationFrom, string replacer, string replacement, string piecename)
         {
-            if (piecename.Contains("W"))
+            if (piecename[0] == 'W')
             {
                 replacement = replacement.ToUpper();
             }
-            if (piecename.Contains("B"))
+            if (piecename[0] == 'B')
             {
                 replacement = replacement.ToLower();
             }
