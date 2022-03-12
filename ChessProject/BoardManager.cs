@@ -257,7 +257,7 @@ namespace ChessProject
             List<int> a = new List<int>();
 
             // Determining the board's first value
-            if (pt.X > 0)
+            if (pt.X >= 0)
             {
                 for (int i = 0; i < 8; i++)
                 {
@@ -271,7 +271,7 @@ namespace ChessProject
             {
                 Console.WriteLine("Mouse's x-coordinate is off the canvas!");
             }
-            if (pt.Y > 0)
+            if (pt.Y >= 0)
             {
                 for (int j = 0; j < 8; j++)
                 {
@@ -287,6 +287,23 @@ namespace ChessProject
             }
 
             return a;
+        }
+        public Point pointLocation(string[,] board, string shortname)
+        {
+            Point pt = new Point();
+
+            for (int i = 0; i < 7; i++)
+            {
+                for (int j = 0; j < 7; j++)
+                {
+                    if(board[i, j] == shortname)
+                    {
+
+                    }
+                }
+            }
+
+            return pt;
         }
 
 

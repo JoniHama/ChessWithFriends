@@ -39,6 +39,34 @@ namespace ChessProject
                 vs = nooneWay(board, location[0], location[1], "sideways", 99, "down", name);
                 return vs;
             }
+            if (name.Contains("Rook"))
+            {
+                vs = nooneWay(board, location[0], location[1], "rook", 99, "down", name);
+                return vs;
+            }
+            if (name.Contains("Queen"))
+            {
+                vs = nooneWay(board, location[0], location[1], "rook", 99, "down", name);
+                List<int> vs2 = nooneWay(board, location[0], location[1], "sideways", 99, "down", name);
+
+                foreach (int v in vs2)
+                {
+                    vs.Add(v);
+                }
+
+                return vs;
+            }
+            if (name.Contains("King"))
+            {
+                vs = nooneWay(board, location[0], location[1], "rook", 2, "down", name);
+                List<int> vs2 = nooneWay(board, location[0], location[1], "sideways", 2, "down", name);
+                foreach (int v in vs2)
+                {
+                    vs.Add(v);
+                }
+
+                return vs;
+            }
 
 
             return vs;
@@ -217,6 +245,96 @@ namespace ChessProject
                     {
                         locations.Add(xValue - 2);
                         locations.Add(yValue + 1);
+                    }
+                    break;
+                case "rook":
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (isEnemy(board, xValue, yValue - i))
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue);
+                                locations.Add(yValue - i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue);
+                                locations.Add(yValue - i);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (isEnemy(board, xValue, yValue + i))
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue);
+                                locations.Add(yValue + i);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue);
+                                locations.Add(yValue + i);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (isEnemy(board, xValue - i, yValue))
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue - i);
+                                locations.Add(yValue);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    for (int i = 1; i < moveAmount; i++)
+                    {
+                        if (isEnemy(board, xValue + i, yValue))
+                        {
+                            if (enemyBlock == true)
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue);
+                                enemyBlock = false;
+                                break;
+                            }
+                            else
+                            {
+                                locations.Add(xValue + i);
+                                locations.Add(yValue);
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     break;
 
